@@ -4,17 +4,7 @@ import math
 from collections import defaultdict
 import random
 import globals as G
-# Resource Pack Link:
-# https://www.curseforge.com/minecraft/texture-packs/minecraft-resource-pack-template/download/2846023/file
-# from urllib.request import urlopen
-# 
-# from io import BytesIO
-# from zipfile import ZipFile
-# 
-# zip_url = 'http://example.com/my_file.zip'
-# 
-# with urlopen(zip_url) as f:
-#     with BytesIO(f.read()) as b, ZipFile(b) as myzipfile:
+
 def normalize(pos): 
     x,y,z = pos
     return round(x),round(y),round(z)

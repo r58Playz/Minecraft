@@ -1,5 +1,6 @@
 import pyglet
 from pyglet.gl import *
+import globals as G
 
 
 def cube_vertices(pos,n=0.5):
@@ -12,7 +13,7 @@ class Block:
     collidable = True
     
     def get_tex(self,file):
-        tex = pyglet.image.load(file).get_texture()
+        tex = G.RESOURCE_LOADER.texture(file)
         glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST)
         glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST)
         return pyglet.graphics.TextureGroup(tex)
@@ -39,7 +40,7 @@ class Block:
         self.cuboid(pos, batch)
 
 class GrassBlock(Block):
-    files = ['grass_top.png','dirt.png','grass_side.png']
+    files = ['grass_block_top.png','dirt.png','grass_block_side.png']
 
 class DirtBlock(Block):
     files = ['dirt.png','dirt.png','dirt.png'] 
