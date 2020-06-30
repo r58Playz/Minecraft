@@ -203,6 +203,8 @@ if __name__ == '__main__':
     glClearColor(0.5,0.7,1,1)
     glEnable(GL_DEPTH_TEST)
     #glEnable(GL_CULL_FACE)
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE)
+    glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD_SIGNED)
     pyglet.app.run()
 
 
