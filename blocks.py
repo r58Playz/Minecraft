@@ -3,6 +3,9 @@ from pyglet.gl import *
 import globals as G
 
 
+def colorize_grass():
+    return ('c3B',((92, 200, 66)*4))
+
 def cube_vertices(pos,n=0.5):
     x,y,z = pos; v = tuple((x+X,y+Y,z+Z) for X in (-n,n) for Y in (-n,n) for Z in (-n,n))
     return tuple(tuple(k for j in i for k in v[j]) for i in ((0,1,3,2),(5,4,6,7),(0,4,5,1),(3,7,6,2),(4,0,2,6),(1,5,7,3)))
@@ -16,6 +19,7 @@ class Block:
         tex = G.RESOURCE_LOADER.texture(file)
         glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST)
         glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST)
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
         return pyglet.graphics.TextureGroup(tex)
     
     def __init__(self):
@@ -41,6 +45,20 @@ class Block:
 
 class GrassBlock(Block):
     files = ['grass_block_top.png','dirt.png','grass_block_side.png']
+    
+    def cuboid(self, pos, batch):
+        tex_coords = ('t2f',(0,0, 1,0, 1,1, 0,1, ))
+        f = 'left','right','bottom','top','back','front'
+        x,y,z = pos
+        X,Y,Z = x+1,y+1,z+1
+        cube = []
+        verts = cube_vertices(pos)
+        for i in (0, 1, 2, 3, 4, 5):
+            if f[i] != 'top':
+                cube.append(batch.add(4,GL_QUADS,self.tex[i],('v3f/stream',verts[i]), tex_coords))
+            else:
+                cube.append(batch.add(4,GL_QUADS,self.tex[i],('v3f/stream',verts[i]), tex_coords, colorize_grass()))
+        return tuple(cube)
 
 class DirtBlock(Block):
     files = ['dirt.png','dirt.png','dirt.png'] 

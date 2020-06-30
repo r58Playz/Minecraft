@@ -10,8 +10,9 @@ os.makedirs(path_to_create, exist_ok=True)
 from zipfile import ZipFile
 
 # Download zip from https://www.curseforge.com/minecraft/texture-packs/minecraft-resource-pack-template/download/2846023/file and rename to Resources.zip and place in directory
-zipfle = ZipFile('Resources.zip')
-zipfle.extractall(path=os.path.join(SETTINGS_PATH, 'resource-packs', 'default'))
+if os.listdir(path_to_create) == []:
+    zipfle = ZipFile('Resources.zip')
+    zipfle.extractall(path=os.path.join(SETTINGS_PATH, 'resource-packs', 'default'))
 
 RESOURCE_LOADER = pyglet.resource.Loader(path=[os.path.join(SETTINGS_PATH, 'resource-packs', 'default','assets', 'minecraft'), os.path.join(SETTINGS_PATH, 'resource-packs', 'default', 'assets', 'minecraft', 'textures', 'block')])
 
