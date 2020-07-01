@@ -34,12 +34,11 @@ class Block:
         verts = cube_vertices(pos)
         for i in (0, 1, 2, 3, 4, 5):
             cube.append(batch.add(4,GL_QUADS,self.tex[i],('v3f/stream',verts[i]), tex_coords, ('c3B', ((127, 127, 127)*4))))
-        
         return tuple(cube)
     
     
     def draw(self, pos, batch):
-        self.cuboid(pos, batch)
+        return self.cuboid(pos, batch)
 
 class GrassBlock(Block):
     files = ['grass_block_top.png','dirt.png','grass_block_side.png']
@@ -56,6 +55,7 @@ class GrassBlock(Block):
                 cube.append(batch.add(4,GL_QUADS,self.tex[i],('v3f/stream',verts[i]), tex_coords, ('c3B', ((127,127, 127)*4))))
             else:
                 cube.append(batch.add(4,GL_QUADS,self.tex[i],('v3f/stream',verts[i]), tex_coords, colorize_grass()))
+
         return tuple(cube)
 
 class DirtBlock(Block):

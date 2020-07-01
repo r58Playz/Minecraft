@@ -1,14 +1,20 @@
 from pyglet.gl import *
-from pyglet.window import key
+from pyglet.window import key, mouse
 import math
 from collections import defaultdict
 import random
 import globals as G
+import noise
 
 def normalize(pos): 
     x,y,z = pos
     return round(x),round(y),round(z)
-
+def flatten(lst): 
+    return sum(map(list,lst),[])
+def cube_vertices(pos,n=0.5):
+    x,y,z = pos
+    v = tuple((x+X,y+Y,z+Z) for X in (-n,n) for Y in (-n,n) for Z in (-n,n))
+    return tuple(tuple(k for j in i for k in v[j]) for i in ((0,1,3,2),(5,4,6,7),(0,4,5,1),(3,7,6,2),(4,0,2,6),(1,5,7,3)))
 
 class Perlin:
     def __call__(self,x,y): return (self.noise(x*self.f,y*self.f)+1)/2
@@ -79,11 +85,25 @@ class Model:
             return
         if self.shown[pos].collidable:
             del self.collidable[pos]
+        for lst in self._shown[pos]:
+            lst.delete()
         del self._shown[pos]
         del self.shown[pos]
 
     def draw(self):
         self.batch.draw()
+    def hit_test(self,position,vector,max_distance=8):
+        m = 8
+        x, y, z = position
+        dx, dy, dz = vector
+        previous = None
+        for _ in range(max_distance * m):
+            key = normalize((x, y, z))
+            if key != previous and key in self.shown:
+                return key, previous
+            previous = key
+            x, y, z = x + dx / m, y + dy / m, z + dz / m
+        return None, None
 
 
 
@@ -111,7 +131,7 @@ class Player:
         if not self.dy: self.dy = self.JUMP_SPEED
     
     def get_sight_vector(self):
-        rotX,rotY = self.rot[0]/180*math.pi,self.rot[1]/180*math.pi
+        rotX,rotY = self.rot[0]/180*math.pi,-self.rot[1]/180*math.pi
         dx,dz = math.sin(rotY),-math.cos(rotY)
         dy,m = math.sin(rotX),math.cos(rotX)
         return dx*m,dy,dz*m
@@ -175,7 +195,7 @@ class Window(pyglet.window.Window):
         self.keys = key.KeyStateHandler()
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
-
+        self.reticle = None
         self.model = Model()
         self.player = Player(self.model, (0,100,0),(-30,0))
 
@@ -186,7 +206,20 @@ class Window(pyglet.window.Window):
         if KEY == key.ESCAPE: self.close()
         elif KEY == key.E: self.mouse_lock = not self.mouse_lock
         elif KEY == key.F: self.player.flying = not self.player.flying; self.player.dy = 0
-
+        elif KEY == key.C: self.player.noclip = not self.player.noclip
+    
+    def on_mouse_press(self,x,y,button,MOD):
+        if button == mouse.LEFT:
+            block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[0]
+            if block:
+                if self.keys[key.LSHIFT]:
+                    self.model.hide_block(block)
+                else:
+                    self.model.remove_block(block)
+        elif button == mouse.RIGHT:
+            block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[1]
+            if block: self.model.add_block(block,G.DIRT), self.model.show_block(block)
+    
     def update(self,dt):
         self.player.update(dt,self.keys)
 
@@ -194,15 +227,33 @@ class Window(pyglet.window.Window):
         self.clear()
         self.set3d()
         self.push(self.player.pos,self.player.rot)
+        block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[0]
+        if block:
+            glPolygonMode(GL_FRONT_AND_BACK,GL_LINE); glColor3d(0,0,0)
+            pyglet.graphics.draw(24,GL_QUADS,('v3f/static',flatten(cube_vertices(block,0.52))))
+            glPolygonMode(GL_FRONT_AND_BACK,GL_FILL); glColor3d(1,1,1)
         self.model.draw()
         glPopMatrix()
+        self.set2d()
+        self.reticle.draw(GL_LINES)
+        
+    
+    def on_resize(self, width, height):
+        if self.reticle:
+            self.reticle.delete()
+        x, y = self.width // 2, self.height // 2
+        n = 10
+        self.reticle = pyglet.graphics.vertex_list(4,
+            ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n)), ('c3B', ((255, 255, 255)*4))
+        )
+        
 
 
 if __name__ == '__main__':
     window = Window(width=854,height=480,caption='Minecraft',resizable=True)
     glClearColor(0.5,0.7,1,1)
     glEnable(GL_DEPTH_TEST)
-    #glEnable(GL_CULL_FACE)
+    glEnable(GL_CULL_FACE)
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE)
     glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD_SIGNED)
     pyglet.app.run()
