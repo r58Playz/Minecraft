@@ -14,6 +14,7 @@ class Block:
     #'top', 'bottom', 'side'
     files = []
     collidable = True
+    name = ''
     
     def get_tex(self,file):
         tex = G.RESOURCE_LOADER.texture(file)
@@ -42,6 +43,7 @@ class Block:
 
 class GrassBlock(Block):
     files = ['grass_block_top.png','dirt.png','grass_block_side.png']
+    name = 'Grass'
     
     def cuboid(self, pos, batch):
         tex_coords = ('t2f/stream',(0,0, 1,0, 1,1, 0,1))
@@ -59,10 +61,17 @@ class GrassBlock(Block):
         return tuple(cube)
 
 class DirtBlock(Block):
+    name = 'Dirt'
     files = ['dirt.png','dirt.png','dirt.png']
 
 class StoneBlock(Block):
+    name = 'Stone'
     files = ['stone.png', 'stone.png', 'stone.png']
 
+class CobblestoneBlock(Block):
+    name = 'Cobblestone'
+    files = ['cobblestone.png','cobblestone.png','cobblestone.png']
+
 class Bedrock(Block):
+    name = 'Bedrock'
     files = ['bedrock.png','bedrock.png','bedrock.png']

@@ -89,7 +89,8 @@ class Window(pyglet.window.Window):
 
     def setLock(self,state): self.lock = state; self.set_exclusive_mouse(state)
     lock = False; mouse_lock = property(lambda self:self.lock,setLock)
-
+    inventory = [G.DIRT, G.GRASS, G.STONE, G.COBBLESTONE, G.BEDROCK]
+    block = inventory[0]
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.set_minimum_size(500, 500)
@@ -99,7 +100,14 @@ class Window(pyglet.window.Window):
         self.reticle = None
         self.model = Model()
         self.player = Player(self.model, (0,100,0),(-30,0))
-        self.inventorylabel = pyglet.text.Label('Dirt', x=self.width/2, y=(self.height/2)-100, font_name='Arial', font_size=18, color=(255, 255, 255, 255), anchor_y='top')
+        self.inventorylabel = pyglet.text.Label('Dirt',
+                          font_name='Arial',
+                          font_size=18,
+                          x=self.width, y=self.height,
+                          anchor_x='right', anchor_y='top')
+        self.num_keys = [
+            key._1, key._2, key._3, key._4, key._5,
+            key._6, key._7, key._8, key._9, key._0]
 
     def on_mouse_motion(self,x,y,dx,dy):
         if self.mouse_lock: self.player.mouse_motion(dx,dy)
@@ -108,6 +116,10 @@ class Window(pyglet.window.Window):
         if KEY == key.ESCAPE: self.mouse_lock = False
         elif KEY == key.F: self.player.flying = not self.player.flying; self.player.dy = 0
         elif KEY == key.C: self.player.noclip = not self.player.noclip
+        elif KEY in self.num_keys:
+            index = (KEY - self.num_keys[0]) % len(self.inventory)
+            self.block = self.inventory[index]
+        
     
     def on_mouse_press(self,x,y,button,MOD):
         if self.mouse_lock:
@@ -117,12 +129,13 @@ class Window(pyglet.window.Window):
                     self.model.remove_block(block, player=True)
             elif button == mouse.RIGHT:
                 block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[1]
-                if block: self.model.add_block(block,G.DIRT, player=True)
+                if block: self.model.add_block(block,self.block, player=True)
         else:
             self.mouse_lock = True
     def update(self,dt):
         self.player.update(dt,self.keys)
         self.model.update()
+        self.inventorylabel.text = self.block.name
 
     def on_draw(self):
         self.clear()
@@ -136,6 +149,7 @@ class Window(pyglet.window.Window):
         self.model.draw()
         glPopMatrix()
         self.set2d()
+        self.inventorylabel.draw()
         self.reticle.draw(GL_LINES)
         
     
@@ -147,8 +161,8 @@ class Window(pyglet.window.Window):
         self.reticle = pyglet.graphics.vertex_list(4,
             ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n)), ('c3B', ((255, 255, 255)*4))
         )
-        self.inventorylabel.x = self.width/2
-        self.inventorylabel.y = (self.height/2)-50
+        self.inventorylabel.x = self.width
+        self.inventorylabel.y = self.height
         super(Window, self).on_resize(width, height)
         
 
