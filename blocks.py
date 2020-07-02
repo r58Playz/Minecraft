@@ -44,7 +44,7 @@ class GrassBlock(Block):
     files = ['grass_block_top.png','dirt.png','grass_block_side.png']
     
     def cuboid(self, pos, batch):
-        tex_coords = ('t2f/stream',(0,0, 1,0, 1,1, 0,1, ))
+        tex_coords = ('t2f/stream',(0,0, 1,0, 1,1, 0,1))
         f = 'left','right','bottom','top','back','front'
         x,y,z = pos
         X,Y,Z = x+1,y+1,z+1
@@ -59,4 +59,10 @@ class GrassBlock(Block):
         return tuple(cube)
 
 class DirtBlock(Block):
-    files = ['dirt.png','dirt.png','dirt.png'] 
+    files = ['dirt.png','dirt.png','dirt.png']
+
+class StoneBlock(Block):
+    files = ['stone.png', 'stone.png', 'stone.png']
+
+class Bedrock(Block):
+    files = ['bedrock.png','bedrock.png','bedrock.png']

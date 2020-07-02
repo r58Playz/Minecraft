@@ -18,3 +18,5 @@ RESOURCE_LOADER = pyglet.resource.Loader(path=[os.path.join(SETTINGS_PATH, 'reso
 
 GRASS = blocks.GrassBlock()
 DIRT  = blocks.DirtBlock() 
+STONE = blocks.StoneBlock()
+BEDROCK = blocks.Bedrock()

@@ -1,110 +1,11 @@
 from pyglet.gl import *
 from pyglet.window import key, mouse
 import math
-from collections import defaultdict
+from collections import defaultdict, deque
 import random
 import globals as G
-import noise
-
-def normalize(pos): 
-    x,y,z = pos
-    return round(x),round(y),round(z)
-def flatten(lst): 
-    return sum(map(list,lst),[])
-def cube_vertices(pos,n=0.5):
-    x,y,z = pos
-    v = tuple((x+X,y+Y,z+Z) for X in (-n,n) for Y in (-n,n) for Z in (-n,n))
-    return tuple(tuple(k for j in i for k in v[j]) for i in ((0,1,3,2),(5,4,6,7),(0,4,5,1),(3,7,6,2),(4,0,2,6),(1,5,7,3)))
-
-class Perlin:
-    def __call__(self,x,y): return (self.noise(x*self.f,y*self.f)+1)/2
-    def __init__(self,seed=None):
-        self.f = 15/512; self.m = 65535; p = list(range(self.m))
-        if seed: random.seed(seed)
-        random.shuffle(p); self.p = p+p
-
-    def fade(self,t): return t*t*t*(t*(t*6-15)+10)
-    def lerp(self,t,a,b): return a+t*(b-a)
-    def grad(self,hash,x,y,z):
-        h = hash&15; u = y if h&8 else x
-        v = (x if h==12 or h==14 else z) if h&12 else y
-        return (u if h&1 else -u)+(v if h&2 else -v)
-
-    def noise(self,x,y,z=0):
-        p,fade,lerp,grad = self.p,self.fade,self.lerp,self.grad
-        xf,yf,zf = math.floor(x),math.floor(y),math.floor(z)
-        X,Y,Z = xf%self.m,yf%self.m,zf%self.m
-        x-=xf; y-=yf; z-=zf
-        u,v,w = fade(x),fade(y),fade(z)
-        A = p[X  ]+Y; AA = p[A]+Z; AB = p[A+1]+Z
-        B = p[X+1]+Y; BA = p[B]+Z; BB = p[B+1]+Z
-        return lerp(w,lerp(v,lerp(u,grad(p[AA],x,y,z),grad(p[BA],x-1,y,z)),lerp(u,grad(p[AB],x,y-1,z),grad(p[BB],x-1,y-1,z))),
-                      lerp(v,lerp(u,grad(p[AA+1],x,y,z-1),grad(p[BA+1],x-1,y,z-1)),lerp(u,grad(p[AB+1],x,y-1,z-1),grad(p[BB+1],x-1,y-1,z-1))))
-
-class Model:
-    world, collidable, shown, _shown = defaultdict(),defaultdict(),defaultdict(),defaultdict()
-
-    def __init__(self):
-        self.batch = pyglet.graphics.Batch()
-        self.perlin = Perlin()
-        self.gen_terrain()
-        
-    def gen_terrain(self):
-        for x in range(-10, 10):
-            for z in range(-10, 10):
-                y = int(self.perlin(x, z)*40+50)
-                self.add_block((x, y, z), G.GRASS)
-                for yy in range(1, y):
-                    self.add_block((x, yy, z), G.DIRT)
-                    self.show_block((x, yy, z))
-                self.show_block((x, y, z))
-    def add_block(self, pos, block):
-        if pos in self.world:
-            return
-        self.world[pos] = block
-    
-    def remove_block(self, pos):
-        if not pos in self.world:
-            return
-        self.hide_block(pos)
-        del self.world[pos]
-    
-    def show_block(self, pos):
-        if pos in self.shown:
-            return
-        if not pos in self.world:
-            return
-        
-        self.shown[pos] = block = self.world[pos]
-        if block.collidable:
-            self.collidable[pos] = block
-        self._shown[pos] = block.draw(pos, self.batch)
-    
-    def hide_block(self, pos):
-        if not pos in self.shown:
-            return
-        if self.shown[pos].collidable:
-            del self.collidable[pos]
-        for lst in self._shown[pos]:
-            lst.delete()
-        del self._shown[pos]
-        del self.shown[pos]
-
-    def draw(self):
-        self.batch.draw()
-    def hit_test(self,position,vector,max_distance=8):
-        m = 8
-        x, y, z = position
-        dx, dy, dz = vector
-        previous = None
-        for _ in range(max_distance * m):
-            key = normalize((x, y, z))
-            if key != previous and key in self.shown:
-                return key, previous
-            previous = key
-            x, y, z = x + dx / m, y + dy / m, z + dz / m
-        return None, None
-
+from world import Model
+from utils import *
 
 
 class Player:
@@ -191,37 +92,37 @@ class Window(pyglet.window.Window):
 
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.set_minimum_size(300,200)
+        self.set_minimum_size(500, 500)
         self.keys = key.KeyStateHandler()
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
         self.reticle = None
         self.model = Model()
         self.player = Player(self.model, (0,100,0),(-30,0))
+        self.inventorylabel = pyglet.text.Label('Dirt', x=self.width/2, y=(self.height/2)-100, font_name='Arial', font_size=18, color=(255, 255, 255, 255), anchor_y='top')
 
     def on_mouse_motion(self,x,y,dx,dy):
         if self.mouse_lock: self.player.mouse_motion(dx,dy)
 
     def on_key_press(self,KEY,MOD):
-        if KEY == key.ESCAPE: self.close()
-        elif KEY == key.E: self.mouse_lock = not self.mouse_lock
+        if KEY == key.ESCAPE: self.mouse_lock = False
         elif KEY == key.F: self.player.flying = not self.player.flying; self.player.dy = 0
         elif KEY == key.C: self.player.noclip = not self.player.noclip
     
     def on_mouse_press(self,x,y,button,MOD):
-        if button == mouse.LEFT:
-            block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[0]
-            if block:
-                if self.keys[key.LSHIFT]:
-                    self.model.hide_block(block)
-                else:
-                    self.model.remove_block(block)
-        elif button == mouse.RIGHT:
-            block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[1]
-            if block: self.model.add_block(block,G.DIRT), self.model.show_block(block)
-    
+        if self.mouse_lock:
+            if button == mouse.LEFT:
+                block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[0]
+                if block:
+                    self.model.remove_block(block, player=True)
+            elif button == mouse.RIGHT:
+                block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[1]
+                if block: self.model.add_block(block,G.DIRT, player=True)
+        else:
+            self.mouse_lock = True
     def update(self,dt):
         self.player.update(dt,self.keys)
+        self.model.update()
 
     def on_draw(self):
         self.clear()
@@ -246,6 +147,9 @@ class Window(pyglet.window.Window):
         self.reticle = pyglet.graphics.vertex_list(4,
             ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n)), ('c3B', ((255, 255, 255)*4))
         )
+        self.inventorylabel.x = self.width/2
+        self.inventorylabel.y = (self.height/2)-50
+        super(Window, self).on_resize(width, height)
         
 
 
