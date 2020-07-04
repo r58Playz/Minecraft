@@ -1,5 +1,6 @@
 import random
 import math
+import noise
 
 class Perlin:
     def __call__(self,x,y): return (self.noise(x*self.f,y*self.f)+1)/2
@@ -25,3 +26,13 @@ class Perlin:
         B = p[X+1]+Y; BA = p[B]+Z; BB = p[B+1]+Z
         return lerp(w,lerp(v,lerp(u,grad(p[AA],x,y,z),grad(p[BA],x-1,y,z)),lerp(u,grad(p[AB],x,y-1,z),grad(p[BB],x-1,y-1,z))),
                       lerp(v,lerp(u,grad(p[AA+1],x,y,z-1),grad(p[BA+1],x-1,y,z-1)),lerp(u,grad(p[AB+1],x,y-1,z-1),grad(p[BB+1],x-1,y-1,z-1)))) 
+
+class RidgedMulti3D(Perlin):
+    def __call__(self, x, y, z): return abs((self.noise(x*self.f,y*self.f, z*self.f)+1)*-1)
+
+
+class Caves3D:
+    source1 = RidgedMulti3D()
+    source2 = RidgedMulti3D()
+    
+    def __call__(self, x, y, z): return (self.source1(x, y, z)*self.source2(x, y, z))

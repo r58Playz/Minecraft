@@ -66,7 +66,7 @@ class Player:
     def collide(self,pos):
         if self.noclip and self.flying: return pos
         pad = 0.25; p = list(pos); np = normalize(pos)
-        for face in ((-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1)):
+        for face in G.FACES:
             for i in (0,1,2):
                 if not face[i]: continue
                 d = (p[i]-np[i])*face[i]
@@ -171,6 +171,7 @@ if __name__ == '__main__':
     window = Window(width=854,height=480,caption='Minecraft',resizable=True)
     glClearColor(0.5,0.7,1,1)
     glEnable(GL_DEPTH_TEST)
+    glDepthFunc(GL_LEQUAL); glAlphaFunc(GL_GEQUAL,1)
     glEnable(GL_CULL_FACE)
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE)
     glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD_SIGNED)
