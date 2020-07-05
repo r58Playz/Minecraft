@@ -8,11 +8,18 @@ path_to_create = os.path.join(SETTINGS_PATH, 'resource-packs', 'default')
 os.makedirs(path_to_create, exist_ok=True)
 
 from zipfile import ZipFile
+from urllib.request import urlopen
 
-# Download zip from https://www.curseforge.com/minecraft/texture-packs/minecraft-resource-pack-template/download/2846023/file and rename to Resources.zip and place in directory
+from io import BytesIO
+
+zip_url = 'https://www.dropbox.com/s/vymkmzr1fsemo53/resource%2Bpack%2Btemplate%2B%28sound%291.15.x%2Bv1.0.zip?dl=1'
 if os.listdir(path_to_create) == []:
-    zipfle = ZipFile('Resources.zip')
-    zipfle.extractall(path=os.path.join(SETTINGS_PATH, 'resource-packs', 'default'))
+    with urlopen(zip_url) as f:
+        with BytesIO(f.read()) as b, ZipFile(b) as zipfle:
+            zipfle.extractall(path=os.path.join(SETTINGS_PATH, 'resource-packs', 'default'))
+
+
+
 
 RESOURCE_LOADER = pyglet.resource.Loader(path=[os.path.join(SETTINGS_PATH, 'resource-packs', 'default','assets', 'minecraft'), os.path.join(SETTINGS_PATH, 'resource-packs', 'default', 'assets', 'minecraft', 'textures', 'block')])
 

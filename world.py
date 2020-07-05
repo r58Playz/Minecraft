@@ -9,8 +9,9 @@ import noise
 class Model:
     world, collidable, shown, _shown = defaultdict(),defaultdict(),defaultdict(),defaultdict()
     batch = pyglet.graphics.Batch()
-    perlin = Perlin()
-    caves =Caves3D()
+    seed = 3295784719208478
+    perlin = Perlin(seed)
+    caves = Caves3D(seed)
     showhide_queue = deque()
     playeractions_queue = deque()
     genqueue = deque()
@@ -25,8 +26,8 @@ class Model:
         return queue.popleft()
     
     def gen_terrain(self):
-        for x in range(-3, 3):
-            for z in range(-3, 3):
+        for x in range(0, 3):
+            for z in range(0, 3):
                 self.gen_sector((x, z))
                 
     def gen_sector(self, pos):
@@ -40,11 +41,11 @@ class Model:
         self.add_block((x, y, z), G.GRASS)
         for yy in range(y-10, y):
             yn = self.caves(x, yy, z)
-            if yn >0.4:
+            if yn >0.5:
                 self.add_block((x, yy, z), G.DIRT)
         for yy in range(1, y-10):
             yn = self.caves(x, yy, z)
-            if yn >0.4:
+            if yn >0.5:
                 self.add_block((x, yy, z), G.STONE)
         self.add_block((x, 0, z), G.BEDROCK)
         
@@ -105,20 +106,18 @@ class Model:
     
     def update(self):
         if self.showhide_queue:
-            for _ in range(100):
+            for _ in range(50):
                 if self.showhide_queue:
                     func, args = self.dequeue(self.showhide_queue)
                     func(*args)
         if self.playeractions_queue:
-            for _ in range(5):
+            for _ in range(3):
                 if self.playeractions_queue:
                     func, args = self.dequeue(self.playeractions_queue)
                     func(*args)
         if self.genqueue:
-            for _ in range(3):
-                if self.genqueue:
-                    func, args = self.dequeue(self.genqueue)
-                    func(*args)
+           func, args = self.dequeue(self.genqueue)
+           func(*args)
     
     def draw(self):
         self.batch.draw()

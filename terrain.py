@@ -32,7 +32,8 @@ class RidgedMulti3D(Perlin):
 
 
 class Caves3D:
-    source1 = RidgedMulti3D()
-    source2 = RidgedMulti3D()
+    def __init__(self, seed=0):
+        self.source1 = RidgedMulti3D(seed)
+        self.source2 = RidgedMulti3D(seed)
     
     def __call__(self, x, y, z): return (self.source1(x, y, z)*self.source2(x, y, z))

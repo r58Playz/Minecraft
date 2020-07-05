@@ -165,10 +165,12 @@ class Window(pyglet.window.Window):
         self.inventorylabel.y = self.height
         super(Window, self).on_resize(width, height)
         
-
+def vec(*args):
+    return (GLfloat * len(args))(*args)
 
 if __name__ == '__main__':
     window = Window(width=854,height=480,caption='Minecraft',resizable=True)
+    light0pos = [20.0,   20.0, 20.0, 1.0]
     glClearColor(0.5,0.7,1,1)
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LEQUAL); glAlphaFunc(GL_GEQUAL,1)
