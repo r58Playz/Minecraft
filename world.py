@@ -90,15 +90,11 @@ class Model:
             return
         
         self.shown[pos] = block = self.world[pos]
-        if block.collidable:
-            self.collidable[pos] = block
         self._shown[pos] = block.draw(pos, self.batch)
     
     def hide_block(self, pos):
         if not pos in self.shown:
             return
-        if self.shown[pos].collidable:
-            del self.collidable[pos]
         for lst in self._shown[pos]:
             lst.delete()
         del self._shown[pos]

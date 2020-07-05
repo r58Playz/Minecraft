@@ -73,10 +73,11 @@ class Player:
                 if d<pad: continue
                 for dy in (0,1):
                     op = list(np); op[1]-=dy; op[i]+=face[i]
-                    if tuple(op) in self.model.collidable:
-                        p[i]-=(d-pad)*face[i]
-                        if face[1]: self.dy = 0
-                        break
+                    if tuple(op) in self.model.world:
+                        if self.model.world[tuple(op)].collidable:
+                            p[i]-=(d-pad)*face[i]
+                            if face[1]: self.dy = 0
+                            break
         return p
 
 class Window(pyglet.window.Window):
