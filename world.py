@@ -7,15 +7,12 @@ import noise
 
 
 class Model:
-    world, collidable, shown, _shown = defaultdict(),defaultdict(),defaultdict(),defaultdict()
+    world, collidable, shown, _shown = defaultdict(),defaultdict(),defaultdict(), defaultdict()
     batch = pyglet.graphics.Batch()
     seed = 3295784719208478
     perlin = Perlin(seed)
     caves = Caves3D(seed)
-    showhide_queue = deque()
-    playeractions_queue = deque()
-    genqueue = deque()
-
+    showhide_queue,playeractions_queue, genqueue = deque(), deque(), deque()
     def __init__(self):
         self.gen_terrain()
     
@@ -35,6 +32,17 @@ class Model:
             for z in range(pos[1]*G.SECTOR_SIDE, (pos[1]*G.SECTOR_SIDE)+G.SECTOR_SIDE+1):
                 self.enqueue(self.genqueue, self.gen_block, (pos[0]+x, pos[1]+z))
     
+    def show_sector(self, sector):
+        if sector not in self.sectors:
+            return
+        for block in self.sectors[sector]:
+            self.show_block(block)
+    def hide_sector(self, sector):
+        if sector not in self.sectors:
+            return
+        for block in self.sectors[sector]:
+            self.hide_block(block)
+            
     def gen_block(self, pos):
         x, z = pos
         y = int(self.perlin(x, z)*64+64)
@@ -68,22 +76,29 @@ class Model:
     def add_block(self, pos, block, player=False):
         if pos in self.world:
             return
+        self.show_block(pos, player)
         self.world[pos] = block
-        if not player:
-            self.enqueue(self.showhide_queue, self.show_block, pos)
-        else:
-            self.enqueue(self.playeractions_queue, self.show_block, pos)
+        
     
     def remove_block(self, pos, player=False):
         if not pos in self.world:
             return
-        if not player:
-            self.enqueue(self.showhide_queue, self.hide_block,pos)
-        else:
-            self.enqueue(self.playeractions_queue, self.hide_block, pos)
+        self.hide_block(pos, player)
         del self.world[pos]
     
-    def show_block(self, pos):
+    def show_block(self, pos, player=False):
+        if not player:
+            self.enqueue(self.showhide_queue, self._show_block, pos)
+        else:
+            self.enqueue(self.playeractions_queue, self._show_block, pos)
+            
+    def hide_block(self, pos, player=False):
+        if not player:
+            self.enqueue(self.showhide_queue, self._hide_block,pos)
+        else:
+            self.enqueue(self.playeractions_queue, self._hide_block, pos)
+    
+    def _show_block(self, pos):
         if pos in self.shown:
             return
         if not pos in self.world:
@@ -92,7 +107,7 @@ class Model:
         self.shown[pos] = block = self.world[pos]
         self._shown[pos] = block.draw(pos, self.batch)
     
-    def hide_block(self, pos):
+    def _hide_block(self, pos):
         if not pos in self.shown:
             return
         for lst in self._shown[pos]:
