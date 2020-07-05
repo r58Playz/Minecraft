@@ -75,3 +75,19 @@ class CobblestoneBlock(Block):
 class Bedrock(Block):
     name = 'Bedrock'
     files = ['bedrock.png','bedrock.png','bedrock.png']
+
+class IronOre(Block):
+    name = 'Iron Ore'
+    files = ['iron_ore.png','iron_ore.png','iron_ore.png']
+
+class CoalOre(Block):
+    name = 'Coal Ore'
+    files = ['coal_ore.png','coal_ore.png','coal_ore.png']
+
+class RedstoneOre(Block):
+    name = 'Redstone Ore'
+    files = ['redstone_ore.png','redstone_ore.png','redstone_ore.png']
+
+class DiamondOre(Block):
+    name = 'Diamond Ore'
+    files = ['diamond_ore.png','diamond_ore.png','diamond_ore.png']
