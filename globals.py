@@ -19,7 +19,7 @@ if os.listdir(path_to_create) == []:
             zipfle.extractall(path=os.path.join(SETTINGS_PATH, 'resource-packs', 'default'))
 
 
-
+VISIBLE_SECTORS_RADIUS = 2
 
 RESOURCE_LOADER = pyglet.resource.Loader(path=[os.path.join(SETTINGS_PATH, 'resource-packs', 'default','assets', 'minecraft'), os.path.join(SETTINGS_PATH, 'resource-packs', 'default', 'assets', 'minecraft', 'textures', 'block')])
 
