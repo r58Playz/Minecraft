@@ -7,25 +7,20 @@ import noise
 
 
 class Model:
-    world, collidable, shown, _shown = defaultdict(),defaultdict(),defaultdict(), defaultdict()
+    world, collidable, shown, _shown, sectors = defaultdict(),defaultdict(),defaultdict(), defaultdict(), defaultdict(list)
     batch = pyglet.graphics.Batch()
     seed = 3295784719208478
     perlin = Perlin(seed)
     caves = Caves3D(seed)
     showhide_queue,playeractions_queue, genqueue = deque(), deque(), deque()
     def __init__(self):
-        self.gen_terrain()
+        self.gen_sector((0, 0))
     
     def enqueue(self, queue, func, *args):
         queue.append((func, args))
     
     def dequeue(self, queue):
         return queue.popleft()
-    
-    def gen_terrain(self):
-        for x in range(0, 3):
-            for z in range(0, 3):
-                self.gen_sector((x, z))
                 
     def gen_sector(self, pos):
         for x in range(pos[0]*G.SECTOR_SIDE, (pos[0]*G.SECTOR_SIDE)+G.SECTOR_SIDE+1):
@@ -46,7 +41,9 @@ class Model:
     def gen_block(self, pos):
         x, z = pos
         y = int(self.perlin(x, z)*64+64)
-        self.add_block((x, y, z), G.GRASS)
+        yn = self.caves(x, y, z)
+        if yn >0.5:
+            self.add_block((x, y, z), G.GRASS)
         for yy in range(y-10, y):
             yn = self.caves(x, yy, z)
             if yn >0.5:
@@ -77,6 +74,7 @@ class Model:
         if pos in self.world:
             return
         self.show_block(pos, player)
+        self.sectors[sectorize(pos)].append(pos)
         self.world[pos] = block
         
     
@@ -115,20 +113,23 @@ class Model:
         del self._shown[pos]
         del self.shown[pos]
     
-    def update(self):
+    def update(self, dt):
+        if self.genqueue:
+            for _ in range(20):
+                if self.genqueue:
+                    func, args = self.dequeue(self.genqueue)
+                    func(*args)
         if self.showhide_queue:
-            for _ in range(50):
+            for _ in range(200):
                 if self.showhide_queue:
                     func, args = self.dequeue(self.showhide_queue)
                     func(*args)
         if self.playeractions_queue:
-            for _ in range(3):
+            for _ in range(10):
                 if self.playeractions_queue:
                     func, args = self.dequeue(self.playeractions_queue)
                     func(*args)
-        if self.genqueue:
-           func, args = self.dequeue(self.genqueue)
-           func(*args)
+
     
     def draw(self):
         self.batch.draw()
@@ -145,5 +146,31 @@ class Model:
             previous = key
             x, y, z = x + dx / m, y + dy / m, z + dz / m
         return None, None
+    
+    def change_sectors(self, before, after):
+        before_set = set()
+        after_set = set()
+        pad = 1
+        for dx in range(-pad, pad + 1):
+            for dy in [0]:  # xrange(-pad, pad + 1):
+                for dz in range(-pad, pad + 1):
+                    if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
+                        continue
+                    if before:
+                        x, y, z = before
+                        before_set.add((x + dx, z + dz, y + dy))
+                    if after:
+                        x, y, z = after
+                        after_set.add((x + dx, z + dz, y + dy))
+        show = after_set - before_set
+        hide = before_set - after_set
+        for sector in show:
+            if sector not in self.sectors:
+                self.gen_sector(sector)
+            self.show_sector(sector)
+        for sector in hide:
+            if sector not in self.sectors:
+                self.gen_sector(sector)
+            self.hide_sector(sector)
     
     

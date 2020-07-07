@@ -2,6 +2,7 @@ import blocks
 import pyglet
 import os
 
+SECTOR_SIZE = 15
 APP_NAME = "Minecraft: Python Edition"
 SETTINGS_PATH = pyglet.resource.get_settings_path(APP_NAME)
 path_to_create = os.path.join(SETTINGS_PATH, 'resource-packs', 'default')
