@@ -1,10 +1,3 @@
-import globals as G
-
-
-def sectorize(position):
-    x, y, z = normalize(position)
-    x, y, z = x // G.SECTOR_SIDE, y // G.SECTOR_SIDE, z // G.SECTOR_SIDE
-    return (x, 0, z)
  
 def normalize(pos): 
     x,y,z = pos
