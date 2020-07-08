@@ -113,6 +113,7 @@ class Model:
         del self._shown[pos]
         del self.shown[pos]
     
+    
     def update(self, dt):
         if self.genqueue:
             for _ in range(20):

@@ -4,7 +4,7 @@ import globals as G
 
 
 def colorize_grass():
-    return ('c4B/stream',((92, 200, 66, 0)*4))
+    return ('c4B/stream',((92, 200, 66, 255)*4))
 
 def cube_vertices(pos,n=0.5):
     x,y,z = pos; v = tuple((x+X,y+Y,z+Z) for X in (-n,n) for Y in (-n,n) for Z in (-n,n))
@@ -34,7 +34,7 @@ class Block:
         cube = []
         verts = cube_vertices(pos)
         for i in (0, 1, 2, 3, 4, 5):
-            cube.append(batch.add(4,GL_QUADS,self.tex[i],('v3f/stream',verts[i]), tex_coords, ('c3B', ((127, 127, 127)*4))))
+            cube.append(batch.add(4,GL_QUADS,self.tex[i],('v3f/stream',verts[i]), tex_coords, ('c4B', ((127, 127, 127, 255)*4))))
         return tuple(cube)
     
     

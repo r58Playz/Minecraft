@@ -7,6 +7,7 @@ import globals as G
 from world import Model
 from utils import *
 from player import Player
+import inventory
 
 
 class Window(pyglet.window.Window):
@@ -39,7 +40,8 @@ class Window(pyglet.window.Window):
             key._1, key._2, key._3, key._4, key._5,
             key._6, key._7, key._8, key._9, key._0]
         pyglet.clock.schedule(self.model.update)
-
+        self.hotbar = inventory.Hotbar(self.width, self.height)
+        
     def on_mouse_motion(self,x,y,dx,dy):
         if self.mouse_lock: self.player.mouse_motion(dx,dy)
 
@@ -81,12 +83,13 @@ class Window(pyglet.window.Window):
         block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[0]
         if block:
             glPolygonMode(GL_FRONT_AND_BACK,GL_LINE); glColor3d(0,0,0)
-            pyglet.graphics.draw(24,GL_QUADS,('v3f/static',flatten(cube_vertices(block,0.52))))
+            pyglet.graphics.draw(24,GL_QUADS,('v3f/static',flatten(cube_vertices(block,0.53))))
             glPolygonMode(GL_FRONT_AND_BACK,GL_FILL); glColor3d(1,1,1)
         self.model.draw()
         glPopMatrix()
         self.set2d()
         self.inventorylabel.draw()
+        self.hotbar.batch.draw()
         self.reticle.draw(GL_LINES)
         
     
@@ -100,6 +103,10 @@ class Window(pyglet.window.Window):
         )
         self.inventorylabel.x = self.width
         self.inventorylabel.y = self.height
+        if self.hotbar.vlist:
+            self.hotbar.remove()
+        self.hotbar.x = (self.width//2)-181
+        self.hotbar.add()
         super(Window, self).on_resize(width, height)
         
 def vec(*args):
@@ -112,6 +119,8 @@ if __name__ == '__main__':
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LEQUAL); glAlphaFunc(GL_GEQUAL,1)
     glEnable(GL_CULL_FACE)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE)
     glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD_SIGNED)
     pyglet.app.run()
