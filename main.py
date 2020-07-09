@@ -20,7 +20,7 @@ class Window(pyglet.window.Window):
 
     def setLock(self,state): self.lock = state; self.set_exclusive_mouse(state)
     lock = False; mouse_lock = property(lambda self:self.lock,setLock)
-    inventory = [G.DIRT, G.GRASS, G.STONE, G.COBBLESTONE, G.BEDROCK, G.IRONORE, G.COALORE, G.REDSTONEORE, G.DIAMONDORE, G.PANORAMA]
+    inventory = [G.DIRT, G.GRASS, G.STONE, G.COBBLESTONE, G.BEDROCK, G.IRONORE, G.COALORE, G.REDSTONEORE, G.DIAMONDORE]
     block = inventory[0]
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
