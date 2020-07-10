@@ -1,8 +1,9 @@
 import random
 import math
 import noise
+
 class Perlin:
-    def __call__(self,x: int,y: int) -> float: return (self.noise(x*self.f,y*self.f)+1)/2
+    def __call__(self,x: int,y: int, z:int=0) -> float: return (self.noise(x*self.f,y*self.f, z*self.f)+1)/2
     def __init__(self,seed=None):
         self.f = 15/512; self.m = 65535; p = list(range(self.m))
         if seed: random.seed(seed)
@@ -36,3 +37,5 @@ class Caves3D:
         self.source2 = RidgedMulti3D(seed)
     
     def __call__(self, x:int, y:int, z:int): return (self.source1(x, y, z)*self.source2(x, y, z))
+
+

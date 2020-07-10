@@ -33,6 +33,7 @@ PANORAMA_LOADER = pyglet.resource.Loader(path=[os.path.join(SETTINGS_PATH, 'reso
 
 FACES = ((-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1))
 SECTOR_SIDE = 15
+SECTOR_PAD = 2
 GRASS = blocks.GrassBlock()
 DIRT  = blocks.DirtBlock() 
 STONE = blocks.StoneBlock()

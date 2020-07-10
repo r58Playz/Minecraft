@@ -7,9 +7,10 @@ import noise
 
 
 class Model:
-    world, collidable, shown, _shown, sectors = defaultdict(),defaultdict(),defaultdict(), defaultdict(), defaultdict(list)
+    world, shown, _shown, sectors = defaultdict(),defaultdict(), defaultdict(), defaultdict(list)
     batch = pyglet.graphics.Batch()
-    seed = 3295784719208478
+    #the well-known repeating seed in minecraft
+    seed = 107038380838084
     perlin = Perlin(seed)
     caves = Caves3D(seed)
     showhide_queue,playeractions_queue, genqueue = deque(), deque(), deque()
@@ -40,17 +41,17 @@ class Model:
             
     def gen_block(self, pos):
         x, z = pos
-        y = int(self.perlin(x, z)*64+64)
+        y = int(self.perlin(x, z)*40+32)
         yn = self.caves(x, y, z)
-        if yn >0.5:
+        if yn >0.4:
             self.add_block((x, y, z), G.GRASS)
         for yy in range(y-10, y):
             yn = self.caves(x, yy, z)
-            if yn >0.5:
+            if yn >0.4:
                 self.add_block((x, yy, z), G.DIRT)
         for yy in range(1, y-10):
             yn = self.caves(x, yy, z)
-            if yn >0.5:
+            if yn >0.4:
                 self.add_block((x, yy, z), G.STONE)
         self.add_block((x, 0, z), G.BEDROCK)
         
@@ -69,6 +70,36 @@ class Model:
                     self.add_block((x, yy, z), G.STONE)
         self.add_block((x, 0, z), G.BEDROCK)
     
+    def show_all_queued_blocks(self):
+        max_blocks = len(self.genqueue)
+        i = 0
+        lastpercent = 0
+        print('Processing generation queue')
+        print('0 % ')
+        for i in range(max_blocks):
+            if self.genqueue:
+                func, args = self.dequeue(self.genqueue)
+                func(*args)
+                i+= 1
+                percent = int((i/max_blocks)*100)
+                if lastpercent != percent:
+                    delete_last_line()
+                    print(percent, '%')
+                lastpercent = percent
+        max_blocks = len(self.showhide_queue)
+        i = 0
+        print('Processing show and hide queue')
+        print('0 %')
+        lastpercent = 0
+        while self.showhide_queue:
+            func, args = self.dequeue(self.showhide_queue)
+            func(*args)
+            i+= 1
+            percent = int((i/max_blocks)*100)
+            if percent != lastpercent:
+                delete_last_line()
+                print(percent, '%')
+            lastpercent = percent
     
     def add_block(self, pos, block, player=False):
         if pos in self.world:
@@ -116,12 +147,12 @@ class Model:
     
     def update(self, dt):
         if self.genqueue:
-            for _ in range(20):
+            for _ in range(40):
                 if self.genqueue:
                     func, args = self.dequeue(self.genqueue)
                     func(*args)
         if self.showhide_queue:
-            for _ in range(200):
+            for _ in range(175):
                 if self.showhide_queue:
                     func, args = self.dequeue(self.showhide_queue)
                     func(*args)
@@ -151,7 +182,7 @@ class Model:
     def change_sectors(self, before, after):
         before_set = set()
         after_set = set()
-        pad = 1
+        pad = G.SECTOR_PAD
         for dx in range(-pad, pad + 1):
             for dy in [0]:  # xrange(-pad, pad + 1):
                 for dz in range(-pad, pad + 1):
