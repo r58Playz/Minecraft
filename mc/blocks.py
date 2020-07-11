@@ -1,6 +1,6 @@
 import pyglet
 from pyglet.gl import *
-import globals as G
+import mc.globals as G
 
 
 def colorize_grass():

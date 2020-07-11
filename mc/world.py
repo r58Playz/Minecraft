@@ -1,8 +1,8 @@
 from collections import defaultdict, deque
 import pyglet
-from terrain import *
-import globals as G
-from utils import *
+from mc.terrain import *
+import mc.globals as G
+from mc.utils import *
 import noise
 
 
@@ -74,28 +74,25 @@ class Model:
         max_blocks = len(self.genqueue)
         i = 0
         lastpercent = 0
-        print('Processing generation queue')
+        print('Processing')
         print('0 % ')
         for i in range(max_blocks):
             if self.genqueue:
                 func, args = self.dequeue(self.genqueue)
                 func(*args)
                 i+= 1
-                percent = int((i/max_blocks)*100)
+                percent = int(((i/max_blocks)*100)/2)
                 if lastpercent != percent:
                     delete_last_line()
                     print(percent, '%')
                 lastpercent = percent
         max_blocks = len(self.showhide_queue)
         i = 0
-        print('Processing show and hide queue')
-        print('0 %')
-        lastpercent = 0
         while self.showhide_queue:
             func, args = self.dequeue(self.showhide_queue)
             func(*args)
             i+= 1
-            percent = int((i/max_blocks)*100)
+            percent = int((((i/max_blocks)*100)/2)+50)
             if percent != lastpercent:
                 delete_last_line()
                 print(percent, '%')

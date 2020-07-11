@@ -1,4 +1,4 @@
-import blocks
+import mc.blocks as blocks
 import pyglet
 import os
 

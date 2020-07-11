@@ -3,11 +3,11 @@ from pyglet.window import key, mouse
 import math
 from collections import defaultdict, deque
 import random
-import globals as G
-from world import Model
-from utils import *
-from player import Player
-import inventory
+import mc.globals as G
+from mc.world import Model
+from mc.utils import *
+from mc.player import Player
+import mc.inventory as inventory
 
 
 class Window(pyglet.window.Window):
@@ -103,7 +103,7 @@ class Window(pyglet.window.Window):
         block = self.model.hit_test(self.player.pos,self.player.get_sight_vector())[0]
         if block:
             glPolygonMode(GL_FRONT_AND_BACK,GL_LINE); glColor3d(0,0,0)
-            pyglet.graphics.draw(24,GL_QUADS,('v3f/static',flatten(cube_vertices(block,0.53))))
+            pyglet.graphics.draw(24,GL_QUADS,('v3f/static',flatten(cube_vertices(block,0.51))))
             glPolygonMode(GL_FRONT_AND_BACK,GL_FILL); glColor3d(1,1,1)
         self.model.draw()
         glPopMatrix()
@@ -144,7 +144,7 @@ def setup_fog():
     glFogf(GL_FOG_START, 20.0)
     glFogf(GL_FOG_END, 60.0)
 
-if __name__ == '__main__':
+def main():
     window = Window(width=854,height=480,caption='Minecraft',resizable=True)
     glClearColor(0.5,0.7,1,1)
     glEnable(GL_DEPTH_TEST)
@@ -161,6 +161,3 @@ if __name__ == '__main__':
     glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD_SIGNED)
     setup_fog()
     pyglet.app.run()
-
-
-

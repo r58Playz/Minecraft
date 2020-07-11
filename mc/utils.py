@@ -1,4 +1,4 @@
-import globals as G
+import mc.globals as G
 SECTOR_SIZE = G.SECTOR_SIZE
 import sys
 from dataclasses import dataclass, field

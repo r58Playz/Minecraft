@@ -1,5 +1,5 @@
 import pyglet
-import globals as G
+import mc.globals as G
 from pyglet.gl import *
 
 
