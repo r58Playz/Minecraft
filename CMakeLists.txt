@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 2.8.12)
+project(perlin_helper)
+set(SOURCE_DIR "mc/")
+include_directories(${SOURCE_DIR})
+set(SOURCES "${SOURCE_DIR}/perlin.cpp")
+add_subdirectory(lib/pybind11)
+pybind11_add_module(perlin_helper ${SOURCES} "${SOURCE_DIR}/bindings.cpp")
