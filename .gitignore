@@ -26,6 +26,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+CMakeFiles
+CMakeCache.txt
+Makefile
+*.so
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

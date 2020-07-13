@@ -1,6 +1,6 @@
 import math
 import mc.globals as G
-from mc.utils import *
+from mc.utils_py import *
 from pyglet.window import key
 
 class Player:

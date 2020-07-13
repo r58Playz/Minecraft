@@ -1,11 +1,11 @@
 #include <pybind11/pybind11.h>
-#include "perlin.hpp"
+#include "utils.hpp"
 
 namespace py = pybind11;
 
-PYBIND11_PLUGIN(perlin_helper)
+PYBIND11_PLUGIN(utils)
 {
-    py::module m("perlin_helper");
+    py::module m("utils");
     m.def("fade", &fade);
     m.def("lerp", &lerp);
     return m.ptr();

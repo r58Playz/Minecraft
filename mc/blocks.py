@@ -1,14 +1,11 @@
 import pyglet
 from pyglet.gl import *
 import mc.globals as G
-
+from mc.utils_py import *
 
 def colorize_grass():
     return ('c4B/stream',((92, 200, 66, 255)*4))
 
-def cube_vertices(pos,n=0.5):
-    x,y,z = pos; v = tuple((x+X,y+Y,z+Z) for X in (-n,n) for Y in (-n,n) for Z in (-n,n))
-    return tuple(tuple(k for j in i for k in v[j]) for i in ((0,1,3,2),(5,4,6,7),(0,4,5,1),(3,7,6,2),(4,0,2,6),(1,5,7,3)))
 
 class Block:
     #'top', 'bottom', 'side'

@@ -2,8 +2,12 @@ from collections import defaultdict, deque
 import pyglet
 from mc.terrain import *
 import mc.globals as G
-from mc.utils import *
+from mc.utils_py import *
 import noise
+def sectorize(position):
+    x, y, z = normalize(position)
+    x, y, z = x // G.SECTOR_SIZE+1, y // G.SECTOR_SIZE+1, z // G. SECTOR_SIZE+1
+    return (x, 0, z)
 
 
 class Model:
@@ -149,7 +153,7 @@ class Model:
                     func, args = self.dequeue(self.genqueue)
                     func(*args)
         if self.showhide_queue:
-            for _ in range(175):
+            for _ in range(150):
                 if self.showhide_queue:
                     func, args = self.dequeue(self.showhide_queue)
                     func(*args)

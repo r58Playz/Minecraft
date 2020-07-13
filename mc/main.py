@@ -1,11 +1,13 @@
+import pyglet
+pyglet.options['debug_gl'] = False
 from pyglet.gl import *
 from pyglet.window import key, mouse
 import math
 from collections import defaultdict, deque
 import random
 import mc.globals as G
-from mc.world import Model
-from mc.utils import *
+from mc.world import Model, sectorize
+from mc.utils_py import *
 from mc.player import Player
 import mc.inventory as inventory
 
@@ -151,11 +153,6 @@ def main():
     glDepthFunc(GL_LEQUAL); glAlphaFunc(GL_GEQUAL,1)
     #glEnable(GL_CULL_FACE)
     glEnable(GL_BLEND)
-    glEnable(GL_FOG)
-    glHint(GL_FOG_HINT,GL_DONT_CARE)
-    glFogi(GL_FOG_MODE,GL_EXP)
-    glFogfv(GL_FOG_COLOR, (GLfloat * 4)(1.0, 1.0, 1.0, 0.01))
-    glFogfv(GL_FOG_DENSITY, (GLfloat)(0.003))
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE)
     glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD_SIGNED)
