@@ -1,7 +1,6 @@
 import random
 import math
 import noise
-import cppimport
 import sys
 import os
 import utils
