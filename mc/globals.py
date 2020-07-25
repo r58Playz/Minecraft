@@ -8,6 +8,7 @@ SETTINGS_PATH = pyglet.resource.get_settings_path(APP_NAME)
 path_to_create = os.path.join(SETTINGS_PATH, 'resource-packs', 'default')
 os.makedirs(path_to_create, exist_ok=True)
 os.makedirs(os.path.join(SETTINGS_PATH, 'resource-packs', 'default', 'panorama'), exist_ok=True)
+BLOCKS_DIR = {} #(BlockID.main, BlockID.sub) -> Block
 
 from zipfile import ZipFile
 from urllib.request import urlopen
@@ -34,12 +35,13 @@ PANORAMA_LOADER = pyglet.resource.Loader(path=[os.path.join(SETTINGS_PATH, 'reso
 FACES = ((-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1))
 SECTOR_SIDE = 15
 SECTOR_PAD = 2
-GRASS = blocks.GrassBlock()
-DIRT  = blocks.DirtBlock() 
-STONE = blocks.StoneBlock()
+GRASS = blocks.Grass()
+DIRT  = blocks.Dirt() 
+STONE = blocks.Stone()
 BEDROCK = blocks.Bedrock()
-COBBLESTONE = blocks.CobblestoneBlock()
+COBBLESTONE = blocks.Cobblestone()
 IRONORE = blocks.IronOre()
 COALORE = blocks.CoalOre()
 REDSTONEORE = blocks.RedstoneOre()
 DIAMONDORE = blocks.DiamondOre()
+AIR = blocks.Air()

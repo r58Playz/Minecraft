@@ -6,12 +6,17 @@ from mc.utils_py import *
 def colorize_grass():
     return ('c4B/stream',((92, 200, 66, 255)*4))
 
+class BlockID:
+    main, sub = None, None
+    def __init__(self, main, sub=0): self.main=main; self.sub=sub
+    def __eq__(self, other): return self.main == other.main and self.sub == other.sub
 
 class Block:
     #'top', 'bottom', 'side'
     files = []
     collidable = True
     name = ''
+    id = BlockID(0)
     
     def get_tex(self,file):
         tex = G.RESOURCE_LOADER.texture(file)
@@ -21,6 +26,10 @@ class Block:
     
     def __init__(self):
         #'left','right','bottom','top','back','front'
+        G.BLOCKS_DIR[(self.id.main, self.id.sub)] = self
+        if self.files == []:
+            self.tex = None
+            return
         self.tex = [self.get_tex(self.files[2]), self.get_tex(self.files[2]), self.get_tex(self.files[1]), self.get_tex(self.files[0]), self.get_tex(self.files[2]), self.get_tex(self.files[2])]
     
     def cuboid(self, pos, batch):
@@ -36,11 +45,13 @@ class Block:
     
     
     def draw(self, pos, batch):
-        return self.cuboid(pos, batch)
+        if self.tex:
+            return self.cuboid(pos, batch)
 
-class GrassBlock(Block):
+class Grass(Block):
     files = ['grass_block_top.png','dirt.png','grass_block_side.png']
     name = 'Grass'
+    id = BlockID(2)
     
     def cuboid(self, pos, batch):
         tex_coords = ('t2f/stream',(0,0, 1,0, 1,1, 0,1))
@@ -57,34 +68,44 @@ class GrassBlock(Block):
 
         return tuple(cube)
 
-class DirtBlock(Block):
+class Dirt(Block):
     name = 'Dirt'
     files = ['dirt.png','dirt.png','dirt.png']
+    id = BlockID(3)
 
-class StoneBlock(Block):
+class Stone(Block):
     name = 'Stone'
     files = ['stone.png', 'stone.png', 'stone.png']
-
-class CobblestoneBlock(Block):
+    id = BlockID(1)
+    
+class Cobblestone(Block):
     name = 'Cobblestone'
     files = ['cobblestone.png','cobblestone.png','cobblestone.png']
+    id = BlockID(4)
 
 class Bedrock(Block):
     name = 'Bedrock'
     files = ['bedrock.png','bedrock.png','bedrock.png']
+    id = BlockID(7)
 
 class IronOre(Block):
     name = 'Iron Ore'
     files = ['iron_ore.png','iron_ore.png','iron_ore.png']
+    id = BlockID(15)
 
 class CoalOre(Block):
     name = 'Coal Ore'
     files = ['coal_ore.png','coal_ore.png','coal_ore.png']
+    id = BlockID(16)
 
 class RedstoneOre(Block):
     name = 'Redstone Ore'
     files = ['redstone_ore.png','redstone_ore.png','redstone_ore.png']
-
+    id = BlockID(73)
 class DiamondOre(Block):
     name = 'Diamond Ore'
     files = ['diamond_ore.png','diamond_ore.png','diamond_ore.png']
+    id = BlockID(56)
+class Air(Block):
+    name = 'Air'
+    id = BlockID(0)
