@@ -133,6 +133,8 @@ class Model:
             return
         if not pos in self.world:
             return
+        if not self.exposed(pos):
+            return
         
         self.shown[pos] = block = self.world[pos]
         self._shown[pos] = block.draw(pos, self.batch)
@@ -144,7 +146,6 @@ class Model:
             lst.delete()
         del self._shown[pos]
         del self.shown[pos]
-    
     
     def update(self, dt):
         if self.genqueue:
@@ -206,4 +207,9 @@ class Model:
                 self.gen_sector(sector)
             self.hide_sector(sector)
     
-    
+    def exposed(self, pos):
+        x, y, z = pos
+        for dx, dy, dz in G.FACES:
+            if (x+dx, y+dy, z+dz) not in self.world:
+                return True
+        return False
