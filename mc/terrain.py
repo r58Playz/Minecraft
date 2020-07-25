@@ -3,7 +3,7 @@ import math
 import noise
 import sys
 import os
-import utils
+import mc.utils as utils
 
 class Perlin:
     def __call__(self,x: int,y: int, z:int=0) -> float: return (self.noise(x*self.f,y*self.f, z*self.f)+1)/2
