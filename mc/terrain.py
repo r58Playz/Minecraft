@@ -1,9 +1,6 @@
 import random
 import math
 import noise
-import sys
-import os
-import mc.utils as utils
 
 class Perlin:
     def __call__(self,x: int,y: int, z:int=0) -> float: return (self.noise(x*self.f,y*self.f, z*self.f)+1)/2
@@ -11,7 +8,9 @@ class Perlin:
         self.f = 15/512; self.m = 65535; p = list(range(self.m))
         if seed: random.seed(seed)
         random.shuffle(p); self.p = p+p
-        self.fade, self.lerp = utils.fade, utils.lerp
+
+    def fade(self,t:float) -> float: return t*t*t*(t*(t*6-15)+10)
+    def lerp(self,t:float,a:float,b:float)->float: return a+t*(b-a)
     def grad(self,hash:hash,x:float,y:float,z:float):
         h = hash&15; u = y if h&8 else x
         v = (x if h==12 or h==14 else z) if h&12 else y
@@ -38,5 +37,4 @@ class Caves3D:
         self.source2 = RidgedMulti3D(seed)
     
     def __call__(self, x:int, y:int, z:int): return (self.source1(x, y, z)*self.source2(x, y, z))
-
-
+ 

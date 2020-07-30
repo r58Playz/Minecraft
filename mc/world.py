@@ -45,17 +45,17 @@ class Model:
             
     def gen_block(self, pos):
         x, z = pos
-        y = int(self.perlin(x, z)*40+32)
+        y = int(self.perlin(x, z ,0)*40+32)
         yn = self.caves(x, y, z)
-        if yn >0.4:
+        if yn >0.2:
             self.add_block((x, y, z), G.GRASS)
         for yy in range(y-10, y):
             yn = self.caves(x, yy, z)
-            if yn >0.4:
+            if yn >0.2:
                 self.add_block((x, yy, z), G.DIRT)
         for yy in range(1, y-10):
             yn = self.caves(x, yy, z)
-            if yn >0.4:
+            if yn >0.2:
                 self.add_block((x, yy, z), G.STONE)
         self.add_block((x, 0, z), G.BEDROCK)
         
@@ -76,6 +76,8 @@ class Model:
     
     def show_all_queued_blocks(self):
         max_blocks = len(self.genqueue)
+        print(max_blocks)
+        print(len(self.showhide_queue))
         i = 0
         lastpercent = 0
         print('Processing')
@@ -138,6 +140,7 @@ class Model:
         
         self.shown[pos] = block = self.world[pos]
         self._shown[pos] = block.draw(pos, self.batch)
+        self.check_neighbors(pos)
     
     def _hide_block(self, pos):
         if not pos in self.shown:
@@ -146,16 +149,30 @@ class Model:
             lst.delete()
         del self._shown[pos]
         del self.shown[pos]
+        self.check_neighbors(pos)
     
+    def check_neighbors(self, position):
+        x, y, z = position
+        for dx, dy, dz in G.FACES:
+            key = (x + dx, y + dy, z + dz)
+            if key not in self.world:
+                continue
+            if self.exposed(key):
+                if key not in self.shown:
+                    self.show_block(key)
+            else:
+                if key in self.shown:
+                    self.hide_block(key)
+
     
     def update(self, dt):
         if self.genqueue:
-            for _ in range(40):
+            for _ in range(400):
                 if self.genqueue:
                     func, args = self.dequeue(self.genqueue)
                     func(*args)
         if self.showhide_queue:
-            for _ in range(150):
+            for _ in range(600):
                 if self.showhide_queue:
                     func, args = self.dequeue(self.showhide_queue)
                     func(*args)
@@ -207,7 +224,16 @@ class Model:
             if sector not in self.sectors:
                 self.gen_sector(sector)
             self.hide_sector(sector)
-    
+        self.gen_sector_lazy(after)
+    def gen_sector_lazy(self, current_sector):
+        pad = G.SECTOR_PAD+1
+        x, y, z = current_sector
+        for dx in range(-pad, pad+1):
+            for dz in range(-pad, pad+1):
+                dy = 0
+                sector = (dx+x, dy+y, dz+z)
+                if sector not in self.sectors:
+                    self.gen_sector(sector)
     def exposed(self, pos):
         x, y, z = pos
         for dx, dy, dz in G.FACES:

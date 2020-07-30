@@ -30,7 +30,7 @@ class Window(pyglet.window.Window):
         pyglet.clock.schedule(self.update)
         self.reticle = None
         self.model = Model()
-        self.player = Player(self.model, (0,int(self.model.perlin(0, 0)*40+32)+2,0),(-30,0))
+        self.player = Player(self.model, (0,int(self.model.perlin(0, 0, 0)*40+32)+2,0),(-30,0))
         pyglet.clock.schedule(self.model.update)
         self.hotbar = inventory.Hotbar(self.width, self.height)
         self.inv = inventory.Inventory(self.width, self.height)
@@ -143,7 +143,7 @@ def setup_fog():
     glFogfv(GL_FOG_COLOR, (GLfloat * 4)(0.5, 0.69, 1.0, 1))
     glHint(GL_FOG_HINT, GL_FASTEST)
     glFogi(GL_FOG_MODE, GL_LINEAR)
-    glFogf(GL_FOG_START, 20.0)
+    glFogf(GL_FOG_START, 30.0)
     glFogf(GL_FOG_END, 60.0)
 
 def main():
@@ -156,5 +156,5 @@ def main():
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE)
     glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD_SIGNED)
-    setup_fog()
+    #setup_fog()
     pyglet.app.run()

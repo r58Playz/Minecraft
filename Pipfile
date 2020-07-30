@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 pyglet = "*"
 noise = "*"
-cx_Freeze = "*"
 Cython = "*"
+
 [requires]
 python_version = "3.8"
