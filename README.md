@@ -1,5 +1,6 @@
 # Minecraft 
 This is a minecraft-clone
+NOTE: I have stopped development on this project. I will be working with c++
 
 ## Running
 ### This requires Python 3.
