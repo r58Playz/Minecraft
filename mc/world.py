@@ -76,8 +76,6 @@ class Model:
     
     def show_all_queued_blocks(self):
         max_blocks = len(self.genqueue)
-        print(max_blocks)
-        print(len(self.showhide_queue))
         i = 0
         lastpercent = 0
         print('Processing')
@@ -167,12 +165,12 @@ class Model:
     
     def update(self, dt):
         if self.genqueue:
-            for _ in range(400):
+            for _ in range(200):
                 if self.genqueue:
                     func, args = self.dequeue(self.genqueue)
                     func(*args)
         if self.showhide_queue:
-            for _ in range(600):
+            for _ in range(400):
                 if self.showhide_queue:
                     func, args = self.dequeue(self.showhide_queue)
                     func(*args)
