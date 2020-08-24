@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f3b93e140215c0ccfb720906ba036b3f64a09271ab7ebed354144158f7823e96"
+            "sha256": "af90b1a5fceeeaf3a79fb130175a7dae8a508ccd8f4a158d1d5bf2a6e745eaf1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -91,12 +91,8 @@
             "version": "==1.2.2"
         },
         "pyglet": {
-            "hashes": [
-                "sha256:3faac2dad34946aecbce79a8658f89155436fe5c07332229160c6eba302ff40d",
-                "sha256:9832442d59ee06acbeff12e128cf6d5aee271e94c09386040db8f0feae277013"
-            ],
-            "index": "pypi",
-            "version": "==1.5.7"
+            "git": "https://github.com/pyglet/pyglet.git",
+            "ref": "cf370cd6d9a57d24492afc9c095e4017aa8cd1d3"
         }
     },
     "develop": {}
