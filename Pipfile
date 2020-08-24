@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-pyglet = "*"
+pyglet = {git = "https://github.com/pyglet/pyglet.git"}
 noise = "*"
 Cython = "*"
 
